@@ -1,4 +1,4 @@
-import express, { Request, Response, Router } from 'express';
+import express, { NextFunction, Request, Response, Router } from 'express';
 import AuthController from './controllers/auth.controller';
 import UsersController from './controllers/users.controller';
 import { requireAdmin, requireAuth } from './middlewares/auth.middleware';
@@ -75,5 +75,15 @@ router.post('/pagamentos', PagamentosController.create);
 router.get('/pagamentos/:id', PagamentosController.getById);
 
 app.use(router);
+
+app.use((error: Error, req: Request, res: Response, next: NextFunction) => {
+    console.error(error);
+
+    if (res.headersSent) {
+        return next(error);
+    }
+
+    return res.status(500).json({ message: 'Erro interno do servidor.' });
+});
 
 export default app;
