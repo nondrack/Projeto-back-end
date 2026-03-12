@@ -1,7 +1,7 @@
 import { Sequelize } from "sequelize";
 
 const sequelize = new Sequelize(
-    "cinema_simples",
+    "cinema_db",
     "root",
     "1234",
     {
