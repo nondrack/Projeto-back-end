@@ -4,6 +4,7 @@ import sequelize from "../config/database";
 class User extends Model {
   declare id_usuario: number;
   declare nome: string;
+  declare cpf: string;
   declare email: string;
   declare senha: string;
   declare tipo_usuario: "admin" | "funcionario" | "cliente";
@@ -20,6 +21,11 @@ User.init(
     nome: {
       type: DataTypes.STRING,
       allowNull: false,
+    },
+    cpf: {
+      type: DataTypes.STRING,
+      allowNull: true,
+      unique: true,
     },
     email: {
       type: DataTypes.STRING,

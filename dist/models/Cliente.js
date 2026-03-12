@@ -6,12 +6,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const sequelize_1 = require("sequelize");
 const database_1 = __importDefault(require("../config/database"));
 class Cliente extends sequelize_1.Model {
-    id_cliente;
-    nome;
-    cpf;
-    email;
-    telefone;
-    data_nascimento;
 }
 Cliente.init({
     id_cliente: {

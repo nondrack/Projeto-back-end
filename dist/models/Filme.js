@@ -6,13 +6,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const sequelize_1 = require("sequelize");
 const database_1 = __importDefault(require("../config/database"));
 class Filme extends sequelize_1.Model {
-    id_filme;
-    titulo;
-    genero;
-    classificacao_etaria;
-    duracao;
-    sinopse;
-    data_lancamento;
 }
 Filme.init({
     id_filme: {
@@ -35,6 +28,9 @@ Filme.init({
     },
     sinopse: {
         type: sequelize_1.DataTypes.TEXT,
+    },
+    poster_url: {
+        type: sequelize_1.DataTypes.STRING,
     },
     data_lancamento: {
         type: sequelize_1.DataTypes.DATE,

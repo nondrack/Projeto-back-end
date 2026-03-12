@@ -16,8 +16,27 @@ class ClientesController {
     }
     static async create(req, res) {
         const { nome, cpf, email, telefone, data_nascimento } = req.body;
-        const cliente = await Cliente_1.default.create({ nome, cpf, email, telefone, data_nascimento });
-        res.send(cliente);
+        const emailNormalizado = String(email || "").trim().toLowerCase();
+        if (!nome || !emailNormalizado) {
+            return res.status(400).json({ message: "Nome e email sao obrigatorios." });
+        }
+        const clienteExistente = await Cliente_1.default.findOne({ where: { email: emailNormalizado } });
+        if (clienteExistente) {
+            await clienteExistente.update({
+                nome,
+                telefone: telefone ?? clienteExistente.get("telefone"),
+                data_nascimento: data_nascimento ?? clienteExistente.get("data_nascimento"),
+            });
+            return res.status(200).json(clienteExistente);
+        }
+        const cliente = await Cliente_1.default.create({
+            nome,
+            cpf,
+            email: emailNormalizado,
+            telefone,
+            data_nascimento,
+        });
+        return res.status(201).json(cliente);
     }
 }
 exports.default = ClientesController;

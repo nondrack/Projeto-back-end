@@ -1,5 +1,7 @@
 import sequelize from "../config/database";
 
+type CountRow = { total: number };
+
 async function run() {
   const [beforeRows] = await sequelize.query(`
     SELECT COUNT(*) AS total
@@ -9,7 +11,7 @@ async function run() {
     WHERE s.id_sala <> a.id_sala
   `);
 
-  const totalBefore = Number((beforeRows as any[])[0]?.total || 0);
+  const totalBefore = Number((beforeRows as CountRow[])[0]?.total || 0);
   console.log(`Inconsistencias antes: ${totalBefore}`);
 
   const [result] = await sequelize.query(`
@@ -35,7 +37,7 @@ async function run() {
     WHERE s.id_sala <> a.id_sala
   `);
 
-  const totalAfter = Number((afterRows as any[])[0]?.total || 0);
+  const totalAfter = Number((afterRows as CountRow[])[0]?.total || 0);
   console.log(`Inconsistencias depois: ${totalAfter}`);
 }
 

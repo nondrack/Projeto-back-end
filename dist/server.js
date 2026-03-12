@@ -6,7 +6,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const app_1 = __importDefault(require("./app"));
 const database_1 = __importDefault(require("./config/database"));
 const port = 3000;
-database_1.default.sync({ alter: true });
+database_1.default.sync();
 app_1.default.listen(port, () => {
     console.log(`Servidor rodando na porta ${port}`);
 });
