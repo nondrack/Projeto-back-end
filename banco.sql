@@ -1,78 +1,148 @@
--- Estrutura de Banco de Dados: Site de Cinema
--- Ferramenta: DrawSQL.app
+-- =========================
+-- CRIAÇÃO DO BANCO
+-- =========================
+CREATE DATABASE cinema_db;
+USE cinema_db;
 
-CREATE TABLE `genero` (
-    `id_genero` INTEGER NOT NULL PRIMARY KEY AUTO_INCREMENT,
-    `nome` VARCHAR(100) NOT NULL
+-- =========================
+-- TABELA USUARIOS (LOGIN)
+-- =========================
+CREATE TABLE usuarios (
+    id_usuario INT AUTO_INCREMENT PRIMARY KEY,
+    nome VARCHAR(100) NOT NULL,
+    email VARCHAR(150) UNIQUE NOT NULL,
+    senha VARCHAR(255) NOT NULL,
+    tipo_usuario ENUM('admin','funcionario','cliente') DEFAULT 'cliente',
+    data_criacao TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE TABLE `filme` (
-    `id_filme` INTEGER NOT NULL PRIMARY KEY AUTO_INCREMENT,
-    `titulo` VARCHAR(255) NOT NULL,
-    `sinopse` TEXT,
-    `duracao_minutos` INTEGER,
-    `classificacao_etaria` VARCHAR(10),
-    `data_lancamento` DATE,
-    `cartaz_url` VARCHAR(255)
+-- =========================
+-- TABELA CLIENTES
+-- =========================
+CREATE TABLE clientes (
+    id_cliente INT AUTO_INCREMENT PRIMARY KEY,
+    nome VARCHAR(100) NOT NULL,
+    cpf VARCHAR(14) UNIQUE,
+    email VARCHAR(150),
+    telefone VARCHAR(20),
+    data_nascimento DATE
 );
 
--- Tabela N-N para filme e genero (nomes no singular)
-CREATE TABLE `filme_genero` (
-    `filme_id` INTEGER NOT NULL,
-    `genero_id` INTEGER NOT NULL,
-    PRIMARY KEY (`filme_id`, `genero_id`),
-    FOREIGN KEY (`filme_id`) REFERENCES `filme`(`id_filme`),
-    FOREIGN KEY (`genero_id`) REFERENCES `genero`(`id_genero`)
+-- =========================
+-- TABELA FILMES
+-- =========================
+CREATE TABLE filmes (
+    id_filme INT AUTO_INCREMENT PRIMARY KEY,
+    titulo VARCHAR(150) NOT NULL,
+    genero VARCHAR(50),
+    classificacao_etaria VARCHAR(10),
+    duracao INT,
+    sinopse TEXT,
+    data_lancamento DATE
 );
 
-CREATE TABLE `cinema` (
-    `id_cinema` INTEGER NOT NULL PRIMARY KEY AUTO_INCREMENT,
-    `nome` VARCHAR(255) NOT NULL,
-    `cidade` VARCHAR(100) NOT NULL,
-    `endereco` VARCHAR(255)
+-- =========================
+-- TABELA SALAS
+-- =========================
+CREATE TABLE salas (
+    id_sala INT AUTO_INCREMENT PRIMARY KEY,
+    nome VARCHAR(50),
+    capacidade INT NOT NULL
 );
 
-CREATE TABLE `sala` (
-    `id_sala` INTEGER NOT NULL PRIMARY KEY AUTO_INCREMENT,
-    `cinema_id` INTEGER NOT NULL,
-    `nome_sala` VARCHAR(50) NOT NULL,
-    `capacidade` INTEGER,
-    FOREIGN KEY (`cinema_id`) REFERENCES `cinema`(`id_cinema`)
+-- =========================
+-- TABELA ASSENTOS
+-- =========================
+CREATE TABLE assentos (
+    id_assento INT AUTO_INCREMENT PRIMARY KEY,
+    id_sala INT,
+    numero VARCHAR(10),
+    fila VARCHAR(5),
+    FOREIGN KEY (id_sala) REFERENCES salas(id_sala)
 );
 
-CREATE TABLE `sessao` (
-    `id_sessao` INTEGER NOT NULL PRIMARY KEY AUTO_INCREMENT,
-    `filme_id` INTEGER NOT NULL,
-    `sala_id` INTEGER NOT NULL,
-    `data_hora` DATETIME NOT NULL,
-    `preco` DECIMAL(10, 2) NOT NULL,
-    `tipo` VARCHAR(50), -- ex: 2D, 3D, IMAX, Dublado, Legendado
-    FOREIGN KEY (`filme_id`) REFERENCES `filme`(`id_filme`),
-    FOREIGN KEY (`sala_id`) REFERENCES `sala`(`id_sala`)
+-- =========================
+-- TABELA SESSOES
+-- =========================
+CREATE TABLE sessoes (
+    id_sessao INT AUTO_INCREMENT PRIMARY KEY,
+    id_filme INT,
+    id_sala INT,
+    horario DATETIME,
+    preco DECIMAL(6,2),
+    FOREIGN KEY (id_filme) REFERENCES filmes(id_filme),
+    FOREIGN KEY (id_sala) REFERENCES salas(id_sala)
 );
 
-CREATE TABLE `usuario` (
-    `id_usuario` INTEGER NOT NULL PRIMARY KEY AUTO_INCREMENT,
-    `nome` VARCHAR(255) NOT NULL,
-    `email` VARCHAR(255) NOT NULL UNIQUE,
-    `senha` VARCHAR(255) NOT NULL
+-- =========================
+-- TABELA INGRESSOS
+-- =========================
+CREATE TABLE ingressos (
+    id_ingresso INT AUTO_INCREMENT PRIMARY KEY,
+    id_sessao INT,
+    id_cliente INT,
+    id_assento INT,
+    data_compra DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (id_sessao) REFERENCES sessoes(id_sessao),
+    FOREIGN KEY (id_cliente) REFERENCES clientes(id_cliente),
+    FOREIGN KEY (id_assento) REFERENCES assentos(id_assento)
 );
 
-CREATE TABLE `compra` (
-    `id_compra` INTEGER NOT NULL PRIMARY KEY AUTO_INCREMENT,
-    `usuario_id` INTEGER NOT NULL,
-    `sessao_id` INTEGER NOT NULL,
-    `data_compra` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    `total` DECIMAL(10, 2) NOT NULL,
-    FOREIGN KEY (`usuario_id`) REFERENCES `usuario`(`id_usuario`),
-    FOREIGN KEY (`sessao_id`) REFERENCES `sessao`(`id_sessao`)
+-- =========================
+-- TABELA PAGAMENTOS
+-- =========================
+CREATE TABLE pagamentos (
+    id_pagamento INT AUTO_INCREMENT PRIMARY KEY,
+    id_ingresso INT,
+    valor DECIMAL(6,2),
+    metodo_pagamento ENUM('cartao','pix','dinheiro'),
+    data_pagamento DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (id_ingresso) REFERENCES ingressos(id_ingresso)
 );
 
--- Tabela para assentos/ingressos específicos
-CREATE TABLE `ingresso` (
-    `id_ingresso` INTEGER NOT NULL PRIMARY KEY AUTO_INCREMENT,
-    `compra_id` INTEGER NOT NULL,
-    `assento` VARCHAR(10) NOT NULL, -- ex: A10, B05
-    FOREIGN KEY (`compra_id`) REFERENCES `compra`(`id_compra`)
-);
+-- =========================
+-- DADOS DE EXEMPLO
+-- =========================
 
+INSERT INTO usuarios (nome,email,senha,tipo_usuario)
+VALUES
+('Administrador','admin@cinema.com','123456','admin'),
+('Funcionario','func@cinema.com','123456','funcionario');
+
+INSERT INTO clientes (nome,cpf,email,telefone,data_nascimento)
+VALUES
+('Joao Silva','123.456.789-00','joao@email.com','44999999999','1995-05-10'),
+('Maria Souza','987.654.321-00','maria@email.com','44988888888','1998-09-21');
+
+INSERT INTO filmes (titulo,genero,classificacao_etaria,duracao,sinopse,data_lancamento)
+VALUES
+('Vingadores','Ação','12',140,'Heróis salvando o mundo','2019-04-25'),
+('Batman','Ação','14',150,'História do cavaleiro das trevas','2022-03-04');
+
+INSERT INTO salas (nome,capacidade)
+VALUES
+('Sala 1',100),
+('Sala 2',80);
+
+INSERT INTO assentos (id_sala,numero,fila)
+VALUES
+(1,'1','A'),
+(1,'2','A'),
+(1,'3','A'),
+(2,'1','A'),
+(2,'2','A');
+
+INSERT INTO sessoes (id_filme,id_sala,horario,preco)
+VALUES
+(1,1,'2026-04-01 19:00:00',25.00),
+(2,2,'2026-04-01 21:00:00',28.00);
+
+INSERT INTO ingressos (id_sessao,id_cliente,id_assento)
+VALUES
+(1,1,1),
+(2,2,4);
+
+INSERT INTO pagamentos (id_ingresso,valor,metodo_pagamento)
+VALUES
+(1,25.00,'pix'),
+(2,28.00,'cartao');

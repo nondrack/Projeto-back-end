@@ -1,18 +1,18 @@
 import { DataTypes, Model } from "sequelize";
 import sequelize from "../config/database";
 
-class User extends Model {
-  public id_usuario!: number;
+class Cliente extends Model {
+  public id_cliente!: number;
   public nome!: string;
+  public cpf!: string;
   public email!: string;
-  public senha!: string;
-  public tipo_usuario!: "admin" | "funcionario" | "cliente";
-  public data_criacao!: Date;
+  public telefone!: string;
+  public data_nascimento!: Date;
 }
 
-User.init(
+Cliente.init(
   {
-    id_usuario: {
+    id_cliente: {
       type: DataTypes.INTEGER,
       autoIncrement: true,
       primaryKey: true,
@@ -21,29 +21,25 @@ User.init(
       type: DataTypes.STRING,
       allowNull: false,
     },
-    email: {
+    cpf: {
       type: DataTypes.STRING,
-      allowNull: false,
       unique: true,
     },
-    senha: {
+    email: {
       type: DataTypes.STRING,
-      allowNull: false,
     },
-    tipo_usuario: {
-      type: DataTypes.ENUM("admin", "funcionario", "cliente"),
-      defaultValue: "cliente",
+    telefone: {
+      type: DataTypes.STRING,
     },
-    data_criacao: {
+    data_nascimento: {
       type: DataTypes.DATE,
-      defaultValue: DataTypes.NOW,
     },
   },
   {
     sequelize,
-    tableName: "usuarios",
+    tableName: "clientes",
     timestamps: false,
   },
 );
 
-export default User;
+export default Cliente;

@@ -17,9 +17,9 @@ class UsersController {
     }
 
     static async create(req: Request, res: Response) {
-        const { name } = req.body;
+        const { nome, email, senha, tipo_usuario } = req.body;
 
-        const user = await User.create({name: name});
+        const user = await User.create({ nome, email, senha, tipo_usuario });
         res.send(user);
     }
 
