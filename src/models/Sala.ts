@@ -2,9 +2,9 @@ import { DataTypes, Model } from "sequelize";
 import sequelize from "../config/database";
 
 class Sala extends Model {
-  public id_sala!: number;
-  public nome!: string;
-  public capacidade!: number;
+  declare id_sala: number;
+  declare nome: string;
+  declare capacidade: number;
 }
 
 Sala.init(

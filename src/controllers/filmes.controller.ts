@@ -16,7 +16,7 @@ class FilmesController {
   }
 
   static async create(req: Request, res: Response) {
-    const { titulo, genero, classificacao_etaria, duracao, sinopse, data_lancamento } = req.body;
+    const { titulo, genero, classificacao_etaria, duracao, sinopse, poster_url, data_lancamento } = req.body;
 
     const filme = await Filme.create({
       titulo,
@@ -24,6 +24,7 @@ class FilmesController {
       classificacao_etaria,
       duracao,
       sinopse,
+      poster_url,
       data_lancamento,
     });
     res.send(filme);

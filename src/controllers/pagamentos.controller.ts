@@ -1,4 +1,5 @@
 import { Request, Response } from "express";
+import Ingresso from "../models/Ingresso";
 import Pagamento from "../models/Pagamento";
 
 class PagamentosController {
@@ -18,8 +19,18 @@ class PagamentosController {
   static async create(req: Request, res: Response) {
     const { id_ingresso, valor, metodo_pagamento, data_pagamento } = req.body;
 
-    const pagamento = await Pagamento.create({ id_ingresso, valor, metodo_pagamento, data_pagamento });
-    res.send(pagamento);
+    const ingresso = await Ingresso.findByPk(Number(id_ingresso));
+    if (!ingresso) {
+      return res.status(400).json({ message: "Ingresso invalido para pagamento." });
+    }
+
+    const pagamento = await Pagamento.create({
+      id_ingresso: Number(id_ingresso),
+      valor,
+      metodo_pagamento,
+      data_pagamento,
+    });
+    return res.status(201).json(pagamento);
   }
 }
 

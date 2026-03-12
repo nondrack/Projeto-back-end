@@ -38,6 +38,7 @@ CREATE TABLE filmes (
     classificacao_etaria VARCHAR(10),
     duracao INT,
     sinopse TEXT,
+    poster_url VARCHAR(255),
     data_lancamento DATE
 );
 
@@ -114,10 +115,10 @@ VALUES
 ('Joao Silva','123.456.789-00','joao@email.com','44999999999','1995-05-10'),
 ('Maria Souza','987.654.321-00','maria@email.com','44988888888','1998-09-21');
 
-INSERT INTO filmes (titulo,genero,classificacao_etaria,duracao,sinopse,data_lancamento)
+INSERT INTO filmes (titulo,genero,classificacao_etaria,duracao,sinopse,poster_url,data_lancamento)
 VALUES
-('Vingadores','Ação','12',140,'Heróis salvando o mundo','2019-04-25'),
-('Batman','Ação','14',150,'História do cavaleiro das trevas','2022-03-04');
+('Vingadores','Ação','12',140,'Heróis salvando o mundo','https://i.imgur.com/8w1NikM.jpg','2019-04-25'),
+('Batman','Ação','14',150,'História do cavaleiro das trevas','https://i.imgur.com/cH3kBRq.jpg','2022-03-04');
 
 INSERT INTO salas (nome,capacidade)
 VALUES

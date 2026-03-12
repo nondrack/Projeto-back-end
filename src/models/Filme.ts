@@ -2,13 +2,14 @@ import { DataTypes, Model } from "sequelize";
 import sequelize from "../config/database";
 
 class Filme extends Model {
-  public id_filme!: number;
-  public titulo!: string;
-  public genero!: string;
-  public classificacao_etaria!: string;
-  public duracao!: number;
-  public sinopse!: string;
-  public data_lancamento!: Date;
+  declare id_filme: number;
+  declare titulo: string;
+  declare genero: string;
+  declare classificacao_etaria: string;
+  declare duracao: number;
+  declare sinopse: string;
+  declare poster_url: string;
+  declare data_lancamento: Date;
 }
 
 Filme.init(
@@ -33,6 +34,9 @@ Filme.init(
     },
     sinopse: {
       type: DataTypes.TEXT,
+    },
+    poster_url: {
+      type: DataTypes.STRING,
     },
     data_lancamento: {
       type: DataTypes.DATE,

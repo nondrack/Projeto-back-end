@@ -2,10 +2,10 @@ import { DataTypes, Model } from "sequelize";
 import sequelize from "../config/database";
 
 class Assento extends Model {
-  public id_assento!: number;
-  public id_sala!: number;
-  public numero!: string;
-  public fila!: string;
+  declare id_assento: number;
+  declare id_sala: number;
+  declare numero: string;
+  declare fila: string;
 }
 
 Assento.init(
