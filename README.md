@@ -8,3 +8,4 @@ cd .\src\
 npx sequelize-cli init
 cd ..
 npm i -D typescript ts-node-dev @types/node @types/express
+v
