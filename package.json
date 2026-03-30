@@ -1,7 +1,7 @@
 {
   "name": "projeto-back-end",
   "version": "1.0.0",
-  "description": "",
+  "description": "- `npm init -y`\r - `npm i sequelize pg pg-hstore dotenv`\r - `npm i express`\r - `npm i -D nodemon sequelize-cli`\r - `mkdir src`\r - `cd .\\src\\`\r - `npx sequelize-cli init`\r - `cd ..`\r - `npm i -D typescript ts-node-dev @types/node @types/express`",
   "main": "index.js",
   "scripts": {
     "dev": "ts-node-dev --respawn src/server.ts",
@@ -28,13 +28,13 @@
     "express": "^5.2.1",
     "jsonwebtoken": "^9.0.3",
     "mysql2": "^3.18.2",
-    "pg": "^8.19.0",
+    "pg": "^8.20.0",
     "pg-hstore": "^2.3.4",
-    "sequelize": "^6.37.7"
+    "sequelize": "^6.37.8"
   },
   "devDependencies": {
     "@types/express": "^5.0.6",
-    "@types/node": "^25.3.3",
+    "@types/node": "^25.5.0",
     "nodemon": "^3.1.14",
     "sequelize-cli": "^6.6.5",
     "ts-node-dev": "^2.0.0",
