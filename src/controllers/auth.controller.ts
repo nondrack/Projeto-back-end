@@ -26,9 +26,11 @@ class AuthController {
     }
 
     const senhaHash = String(user.get("senha") || "");
-    const senhaValida = senhaHash.startsWith("$2")
-      ? await bcrypt.compare(normalizedSenha, senhaHash)
-      : normalizedSenha === senhaHash;
+    if (!senhaHash.startsWith("$2")) {
+      return res.status(401).json({ message: "Email ou senha invalidos." });
+    }
+
+    const senhaValida = await bcrypt.compare(normalizedSenha, senhaHash);
 
     if (!senhaValida) {
       return res.status(401).json({ message: "Email ou senha invalidos." });

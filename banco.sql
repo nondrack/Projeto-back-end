@@ -107,8 +107,8 @@ CREATE TABLE pagamentos (
 
 INSERT INTO usuarios (nome,email,senha,tipo_usuario)
 VALUES
-('Administrador','admin@cinema.com','123456','admin'),
-('Funcionario','func@cinema.com','123456','funcionario');
+('Administrador','admin@cinema.com','$2b$10$.nm6Nzm59gLEn78EQJnie.8gHAnlP/JuRm/Vuxv6riPjFKABuHY.u','admin'),
+('Funcionario','func@cinema.com','$2b$10$OFdNkHF2o/7O7smuszBheuCQWwGAJ3KCl8qZOY6EIn5/GdxOomKtq','funcionario');
 
 INSERT INTO clientes (nome,cpf,email,telefone,data_nascimento)
 VALUES

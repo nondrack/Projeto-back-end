@@ -4,6 +4,14 @@ import Cliente from "../models/Cliente";
 import Ingresso from "../models/Ingresso";
 import Sessao from "../models/Sessao";
 
+type AuthenticatedRequest = Request & {
+  authUser?: {
+    id_usuario: number;
+    email: string;
+    tipo_usuario: string;
+  };
+};
+
 class IngressosController {
   static async findAll(req: Request, res: Response) {
     const ingressos = await Ingresso.findAll();
@@ -18,8 +26,10 @@ class IngressosController {
     res.send(ingresso);
   }
 
-  static async create(req: Request, res: Response) {
+  static async create(req: AuthenticatedRequest, res: Response) {
     const { id_sessao, id_cliente, id_assento, data_compra } = req.body;
+    const emailAutenticado = String(req.authUser?.email || "").trim().toLowerCase();
+    const role = String(req.authUser?.tipo_usuario || "").trim().toLowerCase();
 
     const sessao = await Sessao.findByPk(Number(id_sessao));
     const cliente = await Cliente.findByPk(Number(id_cliente));
@@ -27,6 +37,11 @@ class IngressosController {
 
     if (!sessao || !cliente || !assento) {
       return res.status(400).json({ message: "Sessao, cliente ou assento invalido." });
+    }
+
+    const emailCliente = String(cliente.get("email") || "").trim().toLowerCase();
+    if (role !== "admin" && role !== "adm" && emailCliente !== emailAutenticado) {
+      return res.status(403).json({ message: "Voce nao pode criar ingressos para outro usuario." });
     }
 
     const ingresso = await Ingresso.create({
