@@ -7,7 +7,10 @@
     "dev": "ts-node-dev --respawn src/server.ts",
     "build": "tsc",
     "start": "node dist/server.js",
-    "test": "vitest run"
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:verbose": "vitest run --reporter=verbose",
+    "test:failfast": "vitest run --reporter=verbose --bail=1"
   },
   "repository": {
     "type": "git",
