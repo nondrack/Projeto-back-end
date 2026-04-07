@@ -9,6 +9,11 @@ interface ParametrosPaginacao {
   deslocamento: number;
 }
 
+interface QueryPaginacao {
+  page?: string | number;
+  limit?: string | number;
+}
+
 const PAGINA_INICIAL = 1;
 const LIMITE_PADRAO = 10;
 const LIMITE_MAXIMO = 100;
@@ -24,7 +29,7 @@ const LIMITE_MAXIMO = 100;
  * const { pagina, limite, deslocamento } = extrairPaginacao(req.query);
  * // Resultado: { pagina: 2, limite: 20, deslocamento: 20 }
  */
-export function extrairPaginacao(query: any): ParametrosPaginacao {
+export function extrairPaginacao(query: QueryPaginacao): ParametrosPaginacao {
   const pagina = Math.max(Number(query.page || PAGINA_INICIAL), PAGINA_INICIAL);
   const limite = Math.min(
     Math.max(Number(query.limit || LIMITE_PADRAO), PAGINA_INICIAL),
@@ -48,8 +53,8 @@ export function extrairPaginacao(query: any): ParametrosPaginacao {
  * const resposta = formatarRespostaPaginada(filmes, 100, 1, 10);
  * // Resultado: { dados: [...], paginacao: { pagina: 1, ... } }
  */
-export function formatarRespostaPaginada(
-  dados: any[],
+export function formatarRespostaPaginada<T>(
+  dados: T[],
   total: number,
   pagina: number,
   limite: number
@@ -71,6 +76,6 @@ export function formatarRespostaPaginada(
  * @param query - Objeto de query do request
  * @returns true se contém page ou limit
  */
-export function temPaginacao(query: any): boolean {
+export function temPaginacao(query: QueryPaginacao): boolean {
   return query.page !== undefined || query.limit !== undefined;
 }

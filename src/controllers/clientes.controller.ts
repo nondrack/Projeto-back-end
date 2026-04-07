@@ -10,49 +10,84 @@ type AuthenticatedRequest = Request & {
 };
 
 class ClientesController {
+  private static readonly REQUIRED_MESSAGE = "Nome e email sao obrigatorios.";
+
+  private static normalizeEmail(value: unknown): string {
+    return String(value || "").trim().toLowerCase();
+  }
+
+  private static normalizeName(value: unknown): string {
+    return String(value || "").trim();
+  }
+
+  private static hasRequiredFields(nome: string, email: string): boolean {
+    return Boolean(nome && email);
+  }
+
+  private static async upsertByEmail(
+    email: string,
+    nome: string,
+    cpf: unknown,
+    telefone: unknown,
+    dataNascimento: unknown,
+  ) {
+    const clienteExistente = await Cliente.findOne({ where: { email } });
+
+    if (clienteExistente) {
+      await clienteExistente.update({
+        nome,
+        telefone: telefone ?? clienteExistente.get("telefone"),
+        data_nascimento: dataNascimento ?? clienteExistente.get("data_nascimento"),
+      });
+      return { cliente: clienteExistente, created: false };
+    }
+
+    const cliente = await Cliente.create({
+      nome,
+      cpf,
+      email,
+      telefone,
+      data_nascimento: dataNascimento,
+    });
+
+    return { cliente, created: true };
+  }
+
   static async findAll(req: Request, res: Response) {
     const clientes = await Cliente.findAll();
 
-    res.send(clientes);
+    return res.send(clientes);
   }
 
   static async getById(req: Request, res: Response) {
     const { id } = req.params;
     const cliente = await Cliente.findByPk(Number(id));
 
-    res.send(cliente);
+    return res.send(cliente);
   }
 
   static async create(req: Request, res: Response) {
     const { nome, cpf, email, telefone, data_nascimento } = req.body;
 
-    const emailNormalizado = String(email || "").trim().toLowerCase();
-    if (!nome || !emailNormalizado) {
-      return res.status(400).json({ message: "Nome e email sao obrigatorios." });
+    const nomeNormalizado = ClientesController.normalizeName(nome);
+    const emailNormalizado = ClientesController.normalizeEmail(email);
+    if (!ClientesController.hasRequiredFields(nomeNormalizado, emailNormalizado)) {
+      return res.status(400).json({ message: ClientesController.REQUIRED_MESSAGE });
     }
 
-    const clienteExistente = await Cliente.findOne({ where: { email: emailNormalizado } });
-    if (clienteExistente) {
-      await clienteExistente.update({
-        nome,
-        telefone: telefone ?? clienteExistente.get("telefone"),
-        data_nascimento: data_nascimento ?? clienteExistente.get("data_nascimento"),
-      });
-      return res.status(200).json(clienteExistente);
-    }
-
-    const cliente = await Cliente.create({
-      nome,
+    const upsertResult = await ClientesController.upsertByEmail(
+      emailNormalizado,
+      nomeNormalizado,
       cpf,
-      email: emailNormalizado,
       telefone,
       data_nascimento,
-    });
-    return res.status(201).json(cliente);
+    );
+
+    return res.status(upsertResult.created ? 201 : 200).json(upsertResult.cliente);
   }
 
   static async getMyProfile(req: AuthenticatedRequest, res: Response) {
-    const email = String(req.authUser?.email || "").trim().toLowerCase();
+    const email = ClientesController.normalizeEmail(req.authUser?.email);
     const cliente = await Cliente.findOne({ where: { email } });
 
     if (!cliente) {
@@ -63,32 +98,17 @@ class ClientesController {
   }
 
   static async upsertMyProfile(req: AuthenticatedRequest, res: Response) {
-    const email = String(req.authUser?.email || "").trim().toLowerCase();
-    const nome = String(req.body?.nome || "").trim();
+    const email = ClientesController.normalizeEmail(req.authUser?.email);
+    const nome = ClientesController.normalizeName(req.body?.nome);
     const telefone = req.body?.telefone;
     const data_nascimento = req.body?.data_nascimento;
 
-    if (!email || !nome) {
-      return res.status(400).json({ message: "Nome e email sao obrigatorios." });
+    if (!ClientesController.hasRequiredFields(nome, email)) {
+      return res.status(400).json({ message: ClientesController.REQUIRED_MESSAGE });
     }
 
-    const clienteExistente = await Cliente.findOne({ where: { email } });
-    if (clienteExistente) {
-      await clienteExistente.update({
-        nome,
-        telefone: telefone ?? clienteExistente.get("telefone"),
-        data_nascimento: data_nascimento ?? clienteExistente.get("data_nascimento"),
-      });
-      return res.status(200).json(clienteExistente);
-    }
-
-    const cliente = await Cliente.create({
-      nome,
-      email,
-      telefone,
-      data_nascimento,
-    });
-    return res.status(201).json(cliente);
+    const upsertResult = await ClientesController.upsertByEmail(email, nome, undefined, telefone, data_nascimento);
+    return res.status(upsertResult.created ? 201 : 200).json(upsertResult.cliente);
   }
 }
 

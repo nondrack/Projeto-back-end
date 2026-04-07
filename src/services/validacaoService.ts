@@ -66,7 +66,10 @@ export class ServicoValidacao {
   /**
    * Valida se um campo está preenchido
    */
-  static validarCampoObrigatorio(valor: any, nomeCampo: string): ResultadoValidacao {
+  static validarCampoObrigatorio(
+    valor: string | number | boolean | null | undefined,
+    nomeCampo: string,
+  ): ResultadoValidacao {
     if (valor === undefined || valor === null || valor === "") {
       return { valido: false, erro: `${nomeCampo} é obrigatório` };
     }

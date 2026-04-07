@@ -17,21 +17,16 @@ import { ServicoValidacao } from "../services/validacaoService";
 import { MENSAGENS_ERRO, MENSAGENS_SUCESSO } from "../constants/aplicacao";
 
 class SalasControllerRefatorado {
-  /**
-   * Lista todas as salas com paginação opcional
-   *
-   * GET /salas
-   * GET /salas?page=1&limit=10 (com paginação)
-   */
+  
   static async listarTodas(req: Request, res: Response) {
     try {
-      // Se não há paginação, retorna todas as salas
+    
       if (!temPaginacao(req.query)) {
         const salas = await Sala.findAll();
         return ServicoResposta.enviarSucesso(res, salas);
       }
 
-      // Com paginação
+    
       const { pagina, limite, deslocamento } = extrairPaginacao(req.query);
       const { rows, count } = await Sala.findAndCountAll({
         limit: limite,
@@ -45,14 +40,11 @@ class SalasControllerRefatorado {
     }
   }
 
-  /**
-   * Busca uma sala por ID
-   * GET /salas/:id
-   */
+  
   static async buscarPorId(req: Request, res: Response) {
     try {
       const { id } = req.params;
-      const idNumerico = this.validarIdNumerico(id);
+      const idNumerico = this.validarIdNumerico(String(id));
 
       if (!idNumerico) {
         return ServicoResposta.enviarRequisicaoInvalida(res, "ID inválido");
@@ -73,10 +65,7 @@ class SalasControllerRefatorado {
     }
   }
 
-  /**
-   * Cria uma nova sala
-   * POST /salas
-   */
+ 
   static async criar(req: Request, res: Response) {
     try {
       const { nome, capacidade } = req.body;
@@ -124,7 +113,7 @@ class SalasControllerRefatorado {
       const { nome, capacidade } = req.body;
 
       // Valida ID
-      const idNumerico = this.validarIdNumerico(id);
+      const idNumerico = this.validarIdNumerico(String(id));
       if (!idNumerico) {
         return ServicoResposta.enviarRequisicaoInvalida(res, "ID inválido");
       }
@@ -163,7 +152,7 @@ class SalasControllerRefatorado {
       const { id } = req.params;
 
       // Valida ID
-      const idNumerico = this.validarIdNumerico(id);
+      const idNumerico = this.validarIdNumerico(String(id));
       if (!idNumerico) {
         return ServicoResposta.enviarRequisicaoInvalida(res, "ID inválido");
       }
@@ -214,8 +203,8 @@ class SalasControllerRefatorado {
   /**
    * Prepara dados para atualização, mantendo valores existentes se não fornecidos
    */
-  private static prepararDadosAtualizacao(nome?: string, capacidade?: any) {
-    const dados: any = {};
+  private static prepararDadosAtualizacao(nome?: string, capacidade?: number | string) {
+    const dados: { nome?: string; capacidade?: number } = {};
 
     if (nome !== undefined && nome !== null) {
       dados.nome = ServicoValidacao.normalizarTexto(nome);

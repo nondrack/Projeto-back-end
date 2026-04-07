@@ -13,52 +13,71 @@ type AuthenticatedRequest = Request & {
 };
 
 class IngressosController {
+  private static normalizeText(value: unknown): string {
+    return String(value || "").trim().toLowerCase();
+  }
+
+  private static isAdmin(role: string): boolean {
+    return role === "admin" || role === "adm";
+  }
+
+  private static async hasValidDependencies(idSessao: number, idCliente: number, idAssento: number) {
+    const sessao = await Sessao.findByPk(idSessao);
+    const cliente = await Cliente.findByPk(idCliente);
+    const assento = await Assento.findByPk(idAssento);
+
+    return { sessao, cliente, assento, valid: Boolean(sessao && cliente && assento) };
+  }
+
+  private static serializeIngresso(ingresso: Ingresso) {
+    return {
+      id_ingresso: Number(ingresso.get("id_ingresso")),
+      id_sessao: Number(ingresso.get("id_sessao")),
+      id_cliente: Number(ingresso.get("id_cliente")),
+      id_assento: Number(ingresso.get("id_assento")),
+      data_compra: ingresso.get("data_compra"),
+    };
+  }
+
   static async findAll(req: Request, res: Response) {
     const ingressos = await Ingresso.findAll();
 
-    res.send(ingressos);
+    return res.send(ingressos);
   }
 
   static async getById(req: Request, res: Response) {
     const { id } = req.params;
     const ingresso = await Ingresso.findByPk(Number(id));
 
-    res.send(ingresso);
+    return res.send(ingresso);
   }
 
   static async create(req: AuthenticatedRequest, res: Response) {
     const { id_sessao, id_cliente, id_assento, data_compra } = req.body;
-    const emailAutenticado = String(req.authUser?.email || "").trim().toLowerCase();
-    const role = String(req.authUser?.tipo_usuario || "").trim().toLowerCase();
+    const emailAutenticado = IngressosController.normalizeText(req.authUser?.email);
+    const role = IngressosController.normalizeText(req.authUser?.tipo_usuario);
+    const idSessao = Number(id_sessao);
+    const idCliente = Number(id_cliente);
+    const idAssento = Number(id_assento);
 
-    const sessao = await Sessao.findByPk(Number(id_sessao));
-    const cliente = await Cliente.findByPk(Number(id_cliente));
-    const assento = await Assento.findByPk(Number(id_assento));
-
-    if (!sessao || !cliente || !assento) {
+    const dependencies = await IngressosController.hasValidDependencies(idSessao, idCliente, idAssento);
+    if (!dependencies.valid) {
       return res.status(400).json({ message: "Sessao, cliente ou assento invalido." });
     }
 
-    const emailCliente = String(cliente.get("email") || "").trim().toLowerCase();
-    if (role !== "admin" && role !== "adm" && emailCliente !== emailAutenticado) {
+    const emailCliente = IngressosController.normalizeText(dependencies.cliente?.get("email"));
+    if (!IngressosController.isAdmin(role) && emailCliente !== emailAutenticado) {
       return res.status(403).json({ message: "Voce nao pode criar ingressos para outro usuario." });
     }
 
     const ingresso = await Ingresso.create({
-      id_sessao: Number(id_sessao),
-      id_cliente: Number(id_cliente),
-      id_assento: Number(id_assento),
+      id_sessao: idSessao,
+      id_cliente: idCliente,
+      id_assento: idAssento,
       data_compra,
     });
 
-    const idIngresso = Number(ingresso.get("id_ingresso"));
-    return res.status(201).json({
-      id_ingresso: idIngresso,
-      id_sessao: Number(ingresso.get("id_sessao")),
-      id_cliente: Number(ingresso.get("id_cliente")),
-      id_assento: Number(ingresso.get("id_assento")),
-      data_compra: ingresso.get("data_compra"),
-    });
+    return res.status(201).json(IngressosController.serializeIngresso(ingresso));
   }
 }
 

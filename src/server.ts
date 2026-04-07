@@ -4,6 +4,15 @@ import { DataTypes } from "sequelize";
 
 const port = 3000;
 
+interface IndexField {
+  attribute?: string;
+}
+
+interface IndexMetadata {
+  unique?: boolean;
+  fields?: IndexField[];
+}
+
 async function ensureUsuariosCpfColumn() {
   const queryInterface = sequelize.getQueryInterface();
   const tableDescription = await queryInterface.describeTable("usuarios");
@@ -16,10 +25,10 @@ async function ensureUsuariosCpfColumn() {
   }
 
   const indexesRaw = await queryInterface.showIndex("usuarios");
-  const indexes = Array.isArray(indexesRaw) ? indexesRaw : [];
-  const hasUniqueCpfIndex = indexes.some((index: any) => {
+  const indexes: IndexMetadata[] = Array.isArray(indexesRaw) ? (indexesRaw as IndexMetadata[]) : [];
+  const hasUniqueCpfIndex = indexes.some((index) => {
     const fields = Array.isArray(index.fields)
-      ? index.fields.map((field: any) => String(field.attribute || ""))
+      ? index.fields.map((field) => String(field.attribute || ""))
       : [];
     return index.unique === true && fields.includes("cpf");
   });

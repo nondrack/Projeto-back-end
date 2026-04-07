@@ -12,6 +12,8 @@ vi.mock("../src/models/Assento", () => ({
 
 function createResponse() {
   const res: any = {
+    status: vi.fn().mockReturnThis(),
+    json: vi.fn().mockReturnThis(),
     send: vi.fn().mockReturnThis(),
   };
   return res;
@@ -28,7 +30,8 @@ describe("💺 CRUD DE ASSENTOS", () => {
 
     await AssentosController.findAll(req as any, res);
 
-    expect(res.send).toHaveBeenCalledWith([]);
+    expect(res.status).toHaveBeenCalledWith(200);
+    expect(res.json).toHaveBeenCalledWith([]);
   });
 
   it("✅ SUCESSO: deve buscar assento por id", async () => {
@@ -40,7 +43,8 @@ describe("💺 CRUD DE ASSENTOS", () => {
 
     await AssentosController.getById(req as any, res);
 
-    expect(res.send).toHaveBeenCalledWith(assento);
+    expect(res.status).toHaveBeenCalledWith(200);
+    expect(res.json).toHaveBeenCalledWith(assento);
   });
 
   it("✅ SUCESSO: deve criar assento", async () => {
@@ -52,6 +56,7 @@ describe("💺 CRUD DE ASSENTOS", () => {
 
     await AssentosController.create(req as any, res);
 
-    expect(res.send).toHaveBeenCalledWith(assento);
+    expect(res.status).toHaveBeenCalledWith(201);
+    expect(res.json).toHaveBeenCalledWith(assento);
   });
 });

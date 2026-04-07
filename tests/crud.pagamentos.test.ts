@@ -35,7 +35,8 @@ describe("💳 CRUD DE PAGAMENTOS", () => {
 
     await PagamentosController.findAll(req as any, res);
 
-    expect(res.send).toHaveBeenCalledWith([]);
+    expect(res.status).toHaveBeenCalledWith(200);
+    expect(res.json).toHaveBeenCalledWith([]);
   });
 
   it("❌ SABOTAGEM PAGAMENTO: deve bloquear pagamento para ingresso invalido", async () => {
