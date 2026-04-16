@@ -9,6 +9,7 @@ vi.mock("../src/models/Ingresso", () => ({
   default: {
     findAll: vi.fn(),
     findByPk: vi.fn(),
+    findOne: vi.fn(),
     create: vi.fn(),
   },
 }));
@@ -57,9 +58,10 @@ describe("🎫 CRUD DE INGRESSOS", () => {
   });
 
   it("✅ SUCESSO: deve criar ingresso quando dados forem validos", async () => {
-    (Sessao as any).findByPk.mockResolvedValue({ id_sessao: 1 });
-    (Assento as any).findByPk.mockResolvedValue({ id_assento: 1 });
+    (Sessao as any).findByPk.mockResolvedValue({ id_sessao: 1, get: vi.fn((field: string) => (field === "id_sala" ? 1 : 1)) });
+    (Assento as any).findByPk.mockResolvedValue({ id_assento: 1, get: vi.fn((field: string) => (field === "id_sala" ? 1 : 1)) });
     (Cliente as any).findByPk.mockResolvedValue({ get: vi.fn((field: string) => (field === "email" ? "user@mail.com" : 1)) });
+    (Ingresso as any).findOne.mockResolvedValue(null);
     (Ingresso as any).create.mockResolvedValue({
       get: vi.fn((field: string) => {
         const map: any = {

@@ -78,7 +78,7 @@ router.get('/sessoes/:id', requireAuth, requireAdmin, SessoesController.getById)
 router.put('/sessoes/:id', requireAuth, requireAdmin, SessoesController.update);
 router.delete('/sessoes/:id', requireAuth, requireAdmin, SessoesController.delete);
 
-router.get('/ingressos', requireAuth, requireAdmin, IngressosController.findAll);
+router.get('/ingressos', requireAuth, IngressosController.findAll);
 router.post('/ingressos', requireAuth, IngressosController.create);
 router.get('/ingressos/:id', requireAuth, requireAdmin, IngressosController.getById);
 

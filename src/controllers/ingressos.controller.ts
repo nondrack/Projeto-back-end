@@ -26,7 +26,9 @@ class IngressosController {
     const cliente = await Cliente.findByPk(idCliente);
     const assento = await Assento.findByPk(idAssento);
 
-    return { sessao, cliente, assento, valid: Boolean(sessao && cliente && assento) };
+    const valid = Boolean(sessao && cliente && assento && assento.get("id_sala") === sessao.get("id_sala"));
+
+    return { sessao, cliente, assento, valid };
   }
 
   private static serializeIngresso(ingresso: Ingresso) {
@@ -65,9 +67,11 @@ class IngressosController {
       return res.status(400).json({ message: "Sessao, cliente ou assento invalido." });
     }
 
-    const emailCliente = IngressosController.normalizeText(dependencies.cliente?.get("email"));
-    if (!IngressosController.isAdmin(role) && emailCliente !== emailAutenticado) {
-      return res.status(403).json({ message: "Voce nao pode criar ingressos para outro usuario." });
+    const existingIngresso = await Ingresso.findOne({
+      where: { id_sessao: idSessao, id_assento: idAssento },
+    });
+    if (existingIngresso) {
+      return res.status(400).json({ message: "Assento ja ocupado nesta sessao." });
     }
 
     const ingresso = await Ingresso.create({
